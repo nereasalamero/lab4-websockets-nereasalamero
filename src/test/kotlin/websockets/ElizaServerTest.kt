@@ -8,6 +8,7 @@ import jakarta.websocket.ContainerProvider
 import jakarta.websocket.OnMessage
 import jakarta.websocket.Session
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT
@@ -46,16 +47,10 @@ class ElizaServerTest {
         client.connect("ws://localhost:$port/eliza")
         latch.await()
         val size = list.size
-        // 1. EXPLAIN WHY size = list.size IS NECESSARY
-
-        /* Porque si decides montar un test que tiene en cuenta el size, mejor tener una constante en vez de
-            leerlo cada 2x3 */
-
+        // 1. EXPLAIN WHY size = list.size IS NECESSARY: Because the value of list.size may vary right after the latch.await()
         // 2. REPLACE BY assertXXX expression that checks an interval; assertEquals must not be used;
-        assert(size in 4..5)
-
-        // 3. EXPLAIN WHY assertEquals CANNOT BE USED AND WHY WE SHOULD CHECK THE INTERVAL
-
+        assertTrue(size in 4..5)
+        // 3. EXPLAIN WHY assertEquals CANNOT BE USED AND WHY WE SHOULD CHECK THE INTERVAL: because the exact number of messages can vary slightly, it's not deterministic.
         // 4. COMPLETE assertEquals(XXX, list[XXX])
         assertEquals("Can you think of a specific example?", list[size - 1])
         logger.info { "1. I have received $size messages" }
